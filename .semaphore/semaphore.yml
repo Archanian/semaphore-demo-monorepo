@@ -65,11 +65,14 @@ blocks:
         - name: SMTP
           commands: []
 promotions:
-  - name: Publish Packages
-    pipeline_file: pipeline_2.yml
-    auto_promote:
-      when: branch = 'master' AND result = 'passed'
-  - name: Publish Images
+  - name: Deploy
     pipeline_file: pipeline_3.yml
-    auto_promote:
-      when: branch = 'master' AND result = 'passed'
+    parameters:
+      env_vars:
+        - required: true
+          options:
+            - Production
+            - Staging
+          default_value: ''
+          description: Deployment target
+          name: ENVIRONMENT

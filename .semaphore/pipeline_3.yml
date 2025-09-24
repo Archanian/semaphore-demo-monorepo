@@ -5,19 +5,46 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: Build images
+  - name: API
     task:
       jobs:
         - name: Docker build
           commands:
             - echo "job 1"
-  - name: Push ECR
+        - name: ECR push
+          commands: []
+    run:
+      when: change_in('/src/Helo.Sending.Api') or change_in('/src/Helo.Sending')
+    dependencies: []
+  - name: SMTP
     task:
       jobs:
+        - name: Docker build
+          commands: []
+        - name: ECR push
+          commands: []
+    run:
+      when: change_in('/src/Helo.Sending.Smtp') or change_in('/src/Helo.Sending')
+    dependencies: []
+  - name: Plan
+    dependencies:
+      - API
+      - Job Router
+      - SMTP
+    task:
+      jobs:
+        - name: Terraform Plan
+          commands: []
+  - name: Job Router
+    dependencies: []
+    task:
+      jobs:
+        - name: Docker build
+          commands: []
         - name: ECR push
           commands: []
 promotions:
-  - name: Plan
+  - name: Confirm Deploy
     pipeline_file: pipeline_4.yml
     deployment_target: Staging
     parameters:
