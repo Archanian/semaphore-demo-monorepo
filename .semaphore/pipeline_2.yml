@@ -8,6 +8,6 @@ blocks:
   - name: Nuget publish
     task:
       jobs:
-        - name: ''
+        - name: Publish
           commands:
             - echo "job 1"

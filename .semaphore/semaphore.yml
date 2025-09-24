@@ -5,88 +5,64 @@ agent:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: "\U0001F469\U0001F3FB‍\U0001F3A8 — UI Service"
-    dependencies: []
-    run:
-      when: 'change_in(''/services/ui'', {exclude: ''/services/ui/**/*.md'', pipeline_file: ''ignore'' })'
-    task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/ui
-          - sem-version elixir 1.17
-          - cache restore
-          - mix local.hex --force
-          - mix local.rebar --force
-          - mix deps.get
-          - mix deps.compile
-          - cache store
-      jobs:
-        - name: Lint
-          commands:
-            - mix credo
-        - name: Test
-          commands:
-            - mix test
-  - name: "\U0001F64E — User Service"
-    dependencies: []
-    run:
-      when: 'change_in(''/services/users'', {exclude: ''/services/users/**/*.md'', pipeline_file: ''ignore'' })'
-    task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/users
-          - sem-version ruby 2.7
-          - cache restore
-          - bundle install
-          - cache store
-      jobs:
-        - name: Lint
-          commands:
-            - bundle exec rubocop
-        - name: Test
-          commands:
-            - bundle exec ruby test.rb
-  - name: "\U0001F4B0 — Billing Service"
-    dependencies: []
-    run:
-      when: 'change_in(''/services/billing'', {exclude: ''/services/billing/**/*.md'', pipeline_file: ''ignore'' })'
-    task:
-      prologue:
-        commands:
-          - checkout
-          - cd services/billing
-          - sem-version go 1.22
-          - cache restore
-          - go get ./...
-          - cache store
-      jobs:
-        - name: Lint
-          commands:
-            - gofmt -l .
-        - name: Test
-          commands:
-            - go test ./...
-  - name: Build
+  - name: Core
     dependencies: []
     task:
       jobs:
-        - name: Build solution
+        - name: Build
           commands: []
-  - name: Unit Tests
+        - name: Test
+          commands: []
+  - name: Package
     dependencies:
-      - Build
+      - Core
+    run:
+      when: tag =~ '.*'
     task:
       jobs:
-        - name: 'Job #1'
+        - name: Publish
+          commands: []
+        - name: Push
+          commands: []
+  - name: Job Router
+    dependencies:
+      - Core
+    task:
+      jobs:
+        - name: Test
+          commands: []
+  - name: Job Processor
+    dependencies:
+      - Core
+    task:
+      jobs:
+        - name: Test
+          commands: []
+  - name: API
+    dependencies:
+      - Core
+    task:
+      jobs:
+        - name: Test
+          commands: []
+  - name: SMTP
+    dependencies:
+      - Core
+    task:
+      jobs:
+        - name: Test
           commands: []
   - name: Integration Tests
     dependencies:
-      - Unit Tests
+      - API
+      - Job Processor
+      - Job Router
+      - SMTP
     task:
       jobs:
-        - name: 'Job #1'
+        - name: API
+          commands: []
+        - name: SMTP
           commands: []
 promotions:
   - name: Publish Packages

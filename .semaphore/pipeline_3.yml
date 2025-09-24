@@ -8,13 +8,13 @@ blocks:
   - name: Build images
     task:
       jobs:
-        - name: ''
+        - name: Docker build
           commands:
             - echo "job 1"
   - name: Push ECR
     task:
       jobs:
-        - name: ''
+        - name: ECR push
           commands: []
 promotions:
   - name: Plan

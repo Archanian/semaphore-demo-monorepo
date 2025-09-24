@@ -8,6 +8,6 @@ blocks:
   - name: Terraform apply
     task:
       jobs:
-        - name: ''
+        - name: Apply
           commands:
             - echo "job 1"

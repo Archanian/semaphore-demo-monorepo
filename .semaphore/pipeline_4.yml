@@ -8,7 +8,7 @@ blocks:
   - name: Terraform plan
     task:
       jobs:
-        - name: ''
+        - name: Plan
           commands:
             - echo "job 1"
 promotions:
