@@ -68,3 +68,32 @@ blocks:
         - name: Test
           commands:
             - go test ./...
+  - name: Build
+    dependencies: []
+    task:
+      jobs:
+        - name: Build solution
+          commands: []
+  - name: Unit Tests
+    dependencies:
+      - Build
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands: []
+  - name: Integration Tests
+    dependencies:
+      - Unit Tests
+    task:
+      jobs:
+        - name: 'Job #1'
+          commands: []
+promotions:
+  - name: Publish Packages
+    pipeline_file: pipeline_2.yml
+    auto_promote:
+      when: branch = 'master' AND result = 'passed'
+  - name: Publish Images
+    pipeline_file: pipeline_3.yml
+    auto_promote:
+      when: branch = 'master' AND result = 'passed'
