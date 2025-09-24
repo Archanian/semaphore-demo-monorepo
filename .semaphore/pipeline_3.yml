@@ -1,5 +1,5 @@
 version: v1.0
-name: Prepare
+name: 'Prepare ${{parameters.ENVIRONMENT}}'
 agent:
   machine:
     type: e1-standard-2
@@ -26,7 +26,7 @@ blocks:
     run:
       when: change_in('/src/Helo.Sending.Smtp') or change_in('/src/Helo.Sending')
     dependencies: []
-  - name: Plan
+  - name: 'Plan ${{parameters.ENVIRONMENT}}'
     dependencies:
       - API
       - Job Router
@@ -35,6 +35,9 @@ blocks:
       jobs:
         - name: Terraform Plan
           commands: []
+      env_vars:
+        - name: ENVIRONMENT
+          value: '${{parameters.ENVIRONMENT}}'
   - name: Job Router
     dependencies: []
     task:
@@ -44,15 +47,13 @@ blocks:
         - name: ECR push
           commands: []
 promotions:
-  - name: Confirm Deploy
+  - name: 'Confirm Deploy ${{parameters.ENVIRONMENT}}'
     pipeline_file: pipeline_4.yml
-    deployment_target: Staging
     parameters:
       env_vars:
         - required: true
           options:
-            - Production
-            - Staging
-          default_value: Staging
+            - '${{parameters.ENVIRONMENT}}'
+          default_value: ''
           description: Target deployment environment
           name: ENVIRONMENT
