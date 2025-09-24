@@ -1,25 +1,13 @@
 version: v1.0
-name: Plan
+name: Deploy
 agent:
   machine:
     type: e1-standard-2
     os_image: ubuntu2004
 blocks:
-  - name: Terraform plan
+  - name: Apply
     task:
       jobs:
-        - name: Plan
+        - name: Terraform Apply
           commands:
             - echo "job 1"
-promotions:
-  - name: Deploy
-    pipeline_file: pipeline_5.yml
-    parameters:
-      env_vars:
-        - required: true
-          options:
-            - Production
-            - Staging
-          default_value: ''
-          description: Target deployment environment
-          name: ENVIRONMENT
